@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeShare - Plataforma de Software</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #27ae60;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .login-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .nav-tab.active, .nav-tab:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .software-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .software-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .software-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .software-card .category {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .chat-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chat-message {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-message .user {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .chat-message.own {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: 50px;
+        }
+
+        .chat-message.own .user {
+            color: #fff;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .online-users {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .online-user {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="notification" id="notification"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-code"></i> CodeShare</h1>
+            <p>Plataforma de Compartilhamento de Software & Comunidade de Desenvolvedores</p>
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Conectando...</span>
+            </div>
+        </div>
+
+        <!-- Seção de Login/Registro -->
+        <div class="login-section" id="loginSection">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuth('login')">Login</div>
+                <div class="auth-tab" onclick="switchAuth('register')">Registrar</div>
+            </div>
+            
+            <div class="auth-form">
+                <!-- Form de Login -->
+                <form id="loginForm" class="auth-form-content">
+                    <div class="form-group">
+                        <label>👤 Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🔒 Senha</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn">🚀 Entrar</button>
+                </form>
+
+                <!-- Form de Registro -->
+                <form id="registerForm" class="auth-form-content hidden">
+                    <div class="form-group">
+                        <label>👤 Nome de usuário</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📧 Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🔒 Senha</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn">📝 Criar Conta</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Informações do usuário logado -->
+        <div class="user-info hidden" id="userInfo">
+            Logado como: <strong id="currentUser"></strong>
+            <button class="btn" onclick="logout()" style="margin-left: 15px;">🚪 Sair</button>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('browse')">
+                <i class="fas fa-search"></i> Explorar
+            </button>
+            <button class="nav-tab" onclick="showSection('upload')">
+                <i class="fas fa-upload"></i> Upload
+            </button>
+            <button class="nav-tab" onclick="showSection('chat')">
+                <i class="fas fa-comments"></i> Chat Hacker
+            </button>
+            <button class="nav-tab" onclick="showSection('reviews')">
+                <i class="fas fa-star"></i> Avaliações
+            </button>
+        </div>
+
+        <!-- Seção Explorar -->
+        <div id="browse" class="section active">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="pcSoftwareCount">0</div>
+                    <div>Programas PC</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="androidAppsCount">0</div>
+                    <div>Apps Android</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="scriptsCount">0</div>
+                    <div>Scripts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="downloadsCount">0</div>
+                    <div>Downloads Hoje</div>
+                </div>
+            </div>
+
+            <input type="text" class="search-bar" id="searchBar" placeholder="🔍 Pesquisar programas, apps, scripts...">
+            
+            <div class="filter-options">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="pc">PC Software</button>
+                <button class="filter-btn" data-filter="android">Android APK</button>
+                <button class="filter-btn" data-filter="script">Scripts</button>
+                <button class="filter-btn" data-filter="opensource">Open Source</button>
+            </div>
+
+            <div class="software-grid" id="softwareGrid">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Seção Upload -->
+        <div id="upload" class="section">
+            <h2>📤 Compartilhar Software</h2>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Clique aqui ou arraste arquivos</h3>
+                    <p>Suporte: .exe, .apk, .py, .js, .zip, .rar</p>
+                    <input type="file" id="fileInput" name="file" style="display: none;" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📋 Nome do Software/Script</label>
+                    <input type="text" id="softwareName" name="title" placeholder="Ex: Meu App Incrível v2.0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>📂 Categoria</label>
+                    <select id="softwareCategory" name="category" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="pc-utilities">PC Software - Utilitários</option>
+                        <option value="pc-games">PC Software - Jogos</option>
+                        <option value="pc-security">PC Software - Segurança</option>
+                        <option value="android-social">Android APK - Social</option>
+                        <option value="android-games">Android APK - Jogos</option>
+                        <option value="android-modded">Android APK - Modificado</option>
+                        <option value="script-python">Script - Python</option>
+                        <option value="script-javascript">Script - JavaScript</option>
+                        <option value="script-batch">Script - Batch</option>
+                        <option value="script-powershell">Script - PowerShell</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Descrição</label>
+                    <textarea id="softwareDescription" name="description" rows="4" placeholder="Descreva seu software, funcionalidades, como usar, etc..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>🏷️ Tags (separadas por vírgula)</label>
+                    <input type="text" id="softwareTags" name="tags" placeholder="hack, tool, free, open-source, mod">
+                </div>
+
+                <div class="form-group">
+                    <label>🔒 Tipo de Licença</label>
+                    <select id="softwareLicense" name="license" required>
+                        <option value="free">Free/Gratuito</option>
+                        <option value="opensource">Open Source</option>
+                        <option value="shareware">Shareware</option>
+                        <option value="modded">Modificado/Cracked</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">🚀 Publicar Software</button>
+            </form>
+        </div>
+
+        <!-- Seção Chat -->
+        <div id="chat" class="section">
+            <h2>💬 Chat Hacker - Sala dos Devs</h2>
+            <p style="color: #7f8c8d; margin-bottom: 20px;">Conecte-se com outros hackers, desenvolvedores e entusiastas de tecnologia!</p>
+            
+            <div class="online-users" id="onlineUsers">
+                <strong>👥 Usuários Online:</strong>
+                <span class="online-user">Conectando...</span>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message">
+                        <div class="user">💬 Sistema</div>
+                        <div>Conectando ao chat... Aguarde!</div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" placeholder="Digite sua mensagem..." id="chatInput" disabled>
+                    <button class="btn send-btn" onclick="sendMessage()" id="sendBtn" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Avaliações -->
+        <div id="reviews" class="section">
+            <h2>⭐ Avaliações & Reviews</h2>
+            
+            <div class="software-grid" id="reviewsGrid">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script>
+        // Configurações globais
+        const API_BASE = 'http://localhost:3000/api';
+        let socket = null;
+        let currentUser = null;
+        let isLoggedIn = false;
+        let onlineUsers = [];
+
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadSoftware();
+            checkConnection();
+        });
+
+        // Inicializar aplicação
+        function initializeApp() {
+            // Event listeners para formulários
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+            document.getElementById('searchBar').addEventListener('input', handleSearch);
+            
+            // Event listeners para filtros
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', handleFilter);
+            });
+
+            // Drag and drop para upload
+            setupDragAndDrop();
+        }
+
+        // Verificar conexão com o servidor
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/test`);
+                const data = await response.json();
+                
+                if (data.message) {
+                    updateStatus(true, 'Conectado');
+                    showNotification('Conectado ao servidor!', 'success');
+                    initializeSocket();
+                } else {
+                    updateStatus(false, 'Erro de conexão');
+                }
+            } catch (error) {
+                updateStatus(false, 'Offline');
+                showNotification('Erro de conexão com o servidor', 'error');
+            }
+        }
+
+        // Atualizar status de conexão
+        function updateStatus(connected, text) {
+            const dot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                dot.classList.add('connected');
+            } else {
+                dot.classList.remove('connected');
+            }
+            
+            statusText.textContent = text;
+        }
+
+        // Mostrar notificação
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Alternar entre login e registro
+        function switchAuth(type) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = {
+                login: document.getElementById('loginForm'),
+                register: document.getElementById('registerForm')
+            };
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            Object.values(forms).forEach(form => form.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            forms[type].classList.remove('hidden');
+        }
+
+        // Handle login
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    isLoggedIn = true;
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showUserInfo();
+                    showNotification(`Bem-vindo, ${data.user.username}!`, 'success');
+                    enableChatFeatures();
+                } else {
+                    showNotification(data.message || 'Erro no login', 'error');
+                }
+            } catch (error) {
+                showNotification('Erro de conexão', 'error');
+            }
+        }
+
+        // Handle registro
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showNotification('Conta criada com sucesso! Faça login.', 'success');
+                    switchAuth('login');
+                    document.getElementById('loginEmail').value = email;
+                } else {
+                    showNotification(data.message || 'Erro no registro', 'error');
+                }
+            } catch (error) {
+                showNotification('Erro de conexão', 'error');
+            }
+        }
+
+        // Mostrar informações do usuário
+        function showUserInfo() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('currentUser').textContent = currentUser.username;
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            isLoggedIn = false;
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
+            
+            // Desabilitar chat
+            document.getElementById('chatInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            
+            // Desconectar socket
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
